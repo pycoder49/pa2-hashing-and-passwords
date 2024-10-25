@@ -158,7 +158,7 @@ int main(int argc, char** argv){
 
     // printf(" Did not find a matching password\n");
 
-    const int testing = 0;
+    const int testing = 1;
 
     if (testing) {
         test_hex_to_byte();
