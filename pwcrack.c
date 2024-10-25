@@ -172,17 +172,14 @@ int main(int argc, char** argv){
     hexstr_to_hash(argv[1], hash);
 
     char password[128];
-    char original_password[128];
 
     while (fgets(password, sizeof(password), stdin) != NULL) {
         if (password[strlen(password) - 1] == '\n') {
             password[strlen(password) - 1] = '\0';
         }
 
-        strcpy(original_password, password);
-
         if (crack_password(password, hash)) {
-            printf("Found password: SHA256(%s) = %s\n", original_password, argv[1]);
+            printf("Found password: SHA256(%s) = %s\n", password, argv[1]);
             return 0;
         }
     }
