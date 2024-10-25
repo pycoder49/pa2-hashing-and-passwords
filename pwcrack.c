@@ -123,6 +123,41 @@ void test_crack_password(){
 
 int main(int argc, char** argv){
 
+    // const int testing = 0;
+
+    // if (testing) {
+    //     test_hex_to_byte();
+    //     test_hexstr_to_hash();
+    //     test_check_password();
+    //     test_crack_password();
+    // }
+ 
+    // if (argc < 2) {
+    //     printf("Error: not enough arguments provided!\n");
+    //     printf("Usage: %s <byte 1 in hex> <byte 2 in hex>.../n", argv[0]);
+    //     printf("Example %s a2 b7 99\n", argv[0]);
+    //     return 1;
+    // }
+
+    // unsigned char hash[32];
+    // hexstr_to_hash(argv[1], hash);
+
+    // char password[128];// or you can replace this as char buff [10000]
+
+    // // Read password input from user
+    // while (fgets(password, sizeof(password), stdin) != NULL) {
+    //   if (password[strlen(password) - 1] == '\n'){
+    //     password [strlen(password)-1]= '\0';
+    //   }
+
+    //   if (crack_password (password,hash)){
+    //         printf("Found password: SHA256(%s) = %s\n", password, argv[1]);
+    //         return 0;
+    //   }
+    // }
+
+    // printf(" Did not find a matching password\n");
+
     const int testing = 0;
 
     if (testing) {
@@ -131,32 +166,30 @@ int main(int argc, char** argv){
         test_check_password();
         test_crack_password();
     }
- 
-    if (argc < 2) {
+
+    // Check if at least two arguments (hash and at least one password) are provided
+    if (argc < 3) {
         printf("Error: not enough arguments provided!\n");
-        printf("Usage: %s <byte 1 in hex> <byte 2 in hex>.../n", argv[0]);
-        printf("Example %s a2 b7 99\n", argv[0]);
+        printf("Usage: %s <hash in hex> <password 1> <password 2>...\n", argv[0]);
+        printf("Example: %s a2c3b02cb22af83d6d1ead1d4e18d916599be7c2ef2f017169327df1f7c844fd password secret\n", argv[0]);
         return 1;
     }
 
+    // Convert the hex string (argv[1]) to a binary hash
     unsigned char hash[32];
     hexstr_to_hash(argv[1], hash);
 
-    char password[128];// or you can replace this as char buff [10000]
+    // Loop through the provided passwords (argv[2], argv[3], etc.)
+    for (int i = 2; i < argc; i++) {
+        char* password = argv[i];  // Use the password from command-line arguments
 
-    // Read password input from user
-    while (fgets(password, sizeof(password), stdin) != NULL) {
-      if (password[strlen(password) - 1] == '\n'){
-        password [strlen(password)-1]= '\0';
-      }
-
-      if (crack_password (password,hash)){
+        if (crack_password(password, hash)) {
             printf("Found password: SHA256(%s) = %s\n", password, argv[1]);
             return 0;
-      }
+        }
     }
 
-    printf(" Did not find a matching password\n");
+    printf("Did not find a matching password\n");
 
     return 0;
 }
