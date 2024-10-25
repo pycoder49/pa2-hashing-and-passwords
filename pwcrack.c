@@ -4,6 +4,7 @@
 #include <openssl/sha.h>
 #include <assert.h>
 
+// Milestone 1 part 1
 uint8_t hex_to_byte(unsigned char h1, unsigned char h2){
     int answer = 0;
 
@@ -30,6 +31,7 @@ uint8_t hex_to_byte(unsigned char h1, unsigned char h2){
     return answer;
 }
 
+// Milestone 1 part 2
 void hexstr_to_hash(char hexstr[], unsigned char hash[32]){
     int hex_index = 0;
     for(int i = 1; i < strlen(hexstr); i += 2){
@@ -38,6 +40,7 @@ void hexstr_to_hash(char hexstr[], unsigned char hash[32]){
     }
 }
 
+// Milestone 2
 int8_t check_password(char password[], unsigned char given_hash[32]){
     unsigned char hash[32];
     SHA256(password, strlen(password), hash);
@@ -50,6 +53,7 @@ int8_t check_password(char password[], unsigned char given_hash[32]){
     return 1;
 }
 
+// Milestone 3
 int8_t crack_password(char password[], unsigned char given_hash[]){
     if(check_password(password, given_hash)){
         return 1;
@@ -78,6 +82,9 @@ int8_t crack_password(char password[], unsigned char given_hash[]){
     return 0;
 }
 
+/*
+ * All test functions for each function above
+*/
 void test_hex_to_byte() {
     assert(hex_to_byte('c', '8') == 200);
     assert(hex_to_byte('0', '3') == 3);
@@ -121,45 +128,13 @@ void test_crack_password(){
     printf("it worked???");
 }
 
+
+// main function
 int main(int argc, char** argv){
 
-    // const int testing = 0;
-
-    // if (testing) {
-    //     test_hex_to_byte();
-    //     test_hexstr_to_hash();
-    //     test_check_password();
-    //     test_crack_password();
-    // }
- 
-    // if (argc < 2) {
-    //     printf("Error: not enough arguments provided!\n");
-    //     printf("Usage: %s <byte 1 in hex> <byte 2 in hex>.../n", argv[0]);
-    //     printf("Example %s a2 b7 99\n", argv[0]);
-    //     return 1;
-    // }
-
-    // unsigned char hash[32];
-    // hexstr_to_hash(argv[1], hash);
-
-    // char password[128];
-
-    // while (fgets(password, sizeof(password), stdin) != NULL) {
-    //     if (password[strlen(password) - 1] == '\n') {
-    //         password[strlen(password) - 1] = '\0';
-    //     }
-
-    //     if (crack_password(password, hash)) {
-    //         printf("Found password: SHA256(%s) = %s\n", password, argv[1]);
-    //         return 0;  // Exit if a matching password is found
-    //     }
-    // }
-
-    // printf(" Did not find a matching password\n");
-
     if (argc < 2) {
-        printf("Error: Not enough arguments provided!\n");
-        printf("Usage: %s <hash in hex>\n", argv[0]);
+        printf("Error: Not enough arguments provided\n");
+        printf("Correct way to input: %s <hex hash>\n", argv[0]);
         return 1;
     }
 
@@ -173,6 +148,7 @@ int main(int argc, char** argv){
 
     char password[128];
 
+    // keeps asking user for input until they press CTRL+D
     while (fgets(password, sizeof(password), stdin) != NULL) {
         if (password[strlen(password) - 1] == '\n') {
             password[strlen(password) - 1] = '\0';
@@ -183,7 +159,8 @@ int main(int argc, char** argv){
             return 0;
         }
     }
-
+    
+    // prints this out when they give up
     printf("Did not find a matching password\n");
 
     return 0;
