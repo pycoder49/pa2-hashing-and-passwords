@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <openssl/sha.h>
+#include <assert.h>
 
 uint8_t hex_to_byte(unsigned char h1, unsigned char h2){
     int answer = 0;
@@ -77,35 +78,85 @@ int8_t crack_password(char password[], unsigned char given_hash[]){
     return 0;
 }
 
-int main(){
+void test_hex_to_byte() {
+    assert(hex_to_byte('c', '8') == 200);
+    assert(hex_to_byte('0', '3') == 3);
+    assert(hex_to_byte('0', 'a') == 10);
+    assert(hex_to_byte('1', '0') == 16);
+}
 
-    printf("%d\n", hex_to_byte('c', '8'));
-    char hexstr[] = "a1b2c3";
+void test_hexstr_to_hash() {
+    char hexstr[64] = "a2c3b02cb22af83d6d1ead1d4e18d916599be7c2ef2f017169327df1f7c844fd";
     unsigned char hash[32];
     hexstr_to_hash(hexstr, hash);
-    
-    for (size_t i = 0; i < strlen(hexstr)/2; i++) {
-        printf("0x%02x ", hash[i]); 
+
+    for(int i = 0; i < 32; i += 1) {
+        printf("0x%02x", hash[i]);
     }
     printf("\n");
 
+    assert(hash[0] == 0xa2);
+    assert(hash[31] == 0xfd);
+}
 
+void test_check_password() {
+    char hexstr[64] = "a2c3b02cb22af83d6d1ead1d4e18d916599be7c2ef2f017169327df1f7c844fd";
+    unsigned char hash[32];
+    hexstr_to_hash(hexstr, hash);
 
-    char hash_as_hexstr[] = "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"; // SHA256 hash for "password"
-    unsigned char given_hash[32];
-    hexstr_to_hash(hash_as_hexstr, given_hash);
-    printf("%d\n", check_password("password", given_hash));
+    assert(check_password("password", hash) == 1);
+    assert(check_password("hellalongpassword", hash) == 0);
 
+    printf("it worked???");
+}
 
+void test_crack_password(){
+    char hexstr[64] = "a2c3b02cb22af83d6d1ead1d4e18d916599be7c2ef2f017169327df1f7c844fd";
+    unsigned char hash[32];
+    hexstr_to_hash(hexstr, hash);
 
-    char password[] = "paSsword";
-    char hash_as_hexstrr[] = "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"; // SHA256 hash of "password"
-    unsigned char given_hashh[32];
-    hexstr_to_hash(hash_as_hexstrr, given_hashh);
-    int8_t match = crack_password(password, given_hashh);
-    printf("%d\n", match);
-    printf("%s\n", password);
+    assert(crack_password("password", hash) == 1);
+    assert(crack_password("hellalongpassword", hash) == 0);
 
+    printf("it worked???");
+}
+
+int main(int argc, char** argv){
+
+    const int testing = 0;
+
+    if (testing) {
+        test_hex_to_byte();
+        test_hexstr_to_hash();
+        test_check_password();
+        test_crack_password();
+    }
+ 
+    if (argc < 2) {
+        printf("Error: not enough arguments provided!\n");
+        printf("Usage: %s <byte 1 in hex> <byte 2 in hex>.../n", argv[0]);
+        printf("Example %s a2 b7 99\n", argv[0]);
+        return 1;
+    }
+
+    unsigned char hash[32];
+    hexstr_to_hash(argv[1], hash);
+
+    char password[128];// or you can replace this as char buff [10000]
+
+    // Read password input from user
+    while (fgets(password, sizeof(password), stdin) != NULL) {
+      if (password[strlen(password) - 1] == '\n'){
+        password [strlen(password)-1]= '\0';
+      }
+
+      if (crack_password (password,hash)){
+            printf("Found password: SHA256(%s) = %s\n", password, argv[1]);
+            return 0;
+      }
+    }
+
+    printf(" Did not find a matching password\n");
 
     return 0;
 }
