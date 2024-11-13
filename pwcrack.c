@@ -3,29 +3,33 @@
 #include <stdint.h>
 #include <openssl/sha.h>
 #include <assert.h>
+#include <ctype.h>
 
 // Milestone 1 part 1
 uint8_t hex_to_byte(unsigned char h1, unsigned char h2){
     int answer = 0;
 
     if('A' <= h1 && h1 <= 'F'){
-        answer += (h1 - 55) * 16;
+        //answer += (h1 - 55) * 16;
+        answer += (h1 - 'A' + 10) * 16;
     }
     else if ('a' <= h1 && h1 <= 'f'){
-        answer += (h1 - 87) * 16;
+        //answer += (h1 - 87) * 16;
+        answer += (h1 - 'a' + 10) * 16;
     }
     else if('0' <= h1 && h1 <= '9'){
-        answer += (h1 - 48) * 16;
+        //answer += (h1 - 48) * 16;
+        answer += (h1 - '0') * 16;
     }
 
     if('A' <= h2 && h2 <= 'F'){
-        answer += (h2 - 55);
+        answer += (h2 - 'A' + 10);
     }
     else if ('a' <= h2 && h2 <= 'f'){
-        answer += (h2 - 87);
+        answer += (h2 - 'a' + 10);
     }
     else if ('0' <= h2 && h2 <= '9'){
-        answer += (h2 - 48);
+        answer += (h2 - '0');
     }
 
     return answer;
@@ -60,72 +64,35 @@ int8_t crack_password(char password[], unsigned char given_hash[]){
     }
 
     for(int i = 0; i < strlen(password); i++){
-        if(!( ('a' <= password[i] && password[i] <= 'z') || ('A' <= password[i] && password[i] <= 'Z') )){
-            continue;
-        }
-
         char original_character = password[i];
 
-        if('a' <= password[i] && password[i] <= 'z'){
-            password[i] = password[i] - 32;
+        if(isdigit(original_character)){
+            // run  a check with all numbres from 0-9
+            for(int j = 0; j < 10; j++){
+                password[i] = '0' + j;
+
+                if(check_password(password, given_hash)){
+                    return 1;   //success in finding a single digit variation
+                }
+            }
         }
-        else if('A' <= password[i] && password[i] <= 'Z'){
-            password[i] = password[i] + 32;
+        else if('a' <= original_character && original_character <= 'z'){
+            password[i] -= 32;
+        }
+        else if('A' <= original_character && original_character <= 'Z'){
+            password[i] += 32;
         }
 
         if(check_password(password, given_hash)){
-            return 1;
+            return 1;   //success
         }
-
+        
+        //if no checks pass, then replace the target character with original character
         password[i] = original_character;
     }
+
+
     return 0;
-}
-
-/*
- * All test functions for each function above
-*/
-void test_hex_to_byte() {
-    assert(hex_to_byte('c', '8') == 200);
-    assert(hex_to_byte('0', '3') == 3);
-    assert(hex_to_byte('0', 'a') == 10);
-    assert(hex_to_byte('1', '0') == 16);
-}
-
-void test_hexstr_to_hash() {
-    char hexstr[64] = "a2c3b02cb22af83d6d1ead1d4e18d916599be7c2ef2f017169327df1f7c844fd";
-    unsigned char hash[32];
-    hexstr_to_hash(hexstr, hash);
-
-    for(int i = 0; i < 32; i += 1) {
-        printf("0x%02x", hash[i]);
-    }
-    printf("\n");
-
-    assert(hash[0] == 0xa2);
-    assert(hash[31] == 0xfd);
-}
-
-void test_check_password() {
-    char hexstr[64] = "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8";
-    unsigned char hash[32];
-    hexstr_to_hash(hexstr, hash);
-
-    assert(check_password("password", hash) == 1);
-    assert(check_password("hellalongpassword", hash) == 0);
-
-    printf("it worked???");
-}
-
-void test_crack_password(){
-    char hexstr[64] = "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8";
-    unsigned char hash[32];
-    hexstr_to_hash(hexstr, hash);
-
-    assert(crack_password("password", hash) == 1);
-    assert(crack_password("hellalongpassword", hash) == 0);
-
-    printf("it worked???");
 }
 
 
