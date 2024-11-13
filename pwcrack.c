@@ -9,26 +9,21 @@
 uint8_t hex_to_byte(unsigned char h1, unsigned char h2){
     int answer = 0;
 
-    if('A' <= h1 && h1 <= 'F'){
-        //answer += (h1 - 55) * 16;
-        answer += (h1 - 'A' + 10) * 16;
-    }
-    else if ('a' <= h1 && h1 <= 'f'){
-        //answer += (h1 - 87) * 16;
-        answer += (h1 - 'a' + 10) * 16;
-    }
-    else if('0' <= h1 && h1 <= '9'){
-        //answer += (h1 - 48) * 16;
-        answer += (h1 - '0') * 16;
+    // Check h1 for lower case, upper case, number
+    if ('a' <= h1 && h1 <= 'f') {
+        answer += 16 * (h1 - 'a' + 10);
+    } else if ('A' <= h1 && h1 <= 'F') {
+        answer += 16 * (h1 - 'A' + 10);
+    } else if ('0' <= h1 && h1 <= '9') {
+        answer += 16 * (h1 - '0');
     }
 
-    if('A' <= h2 && h2 <= 'F'){
-        answer += (h2 - 'A' + 10);
-    }
-    else if ('a' <= h2 && h2 <= 'f'){
+    // Check the same for h2
+    if ('a' <= h2 && h2 <= 'f') {
         answer += (h2 - 'a' + 10);
-    }
-    else if ('0' <= h2 && h2 <= '9'){
+    } else if ('A' <= h2 && h2 <= 'F') {
+        answer += (h2 - 'A' + 10);
+    } else if ('0' <= h2 && h2 <= '9') {
         answer += (h2 - '0');
     }
 
@@ -90,7 +85,6 @@ int8_t crack_password(char password[], unsigned char given_hash[]){
         //if no checks pass, then replace the target character with original character
         password[i] = original_character;
     }
-
 
     return 0;
 }
